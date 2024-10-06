@@ -1,7 +1,6 @@
 import * as THREE from "three";
 import { OrbitControls } from "jsm/controls/OrbitControls.js";
 
-// Scene setup
 const scene = new THREE.Scene();
 const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
 const renderer = new THREE.WebGLRenderer();
@@ -11,7 +10,6 @@ document.body.appendChild(renderer.domElement);
 
 const controls = new OrbitControls(camera, renderer.domElement);
 
-// Starfield background
 const starGeometry = new THREE.BufferGeometry();
 const starCount = 30000;
 const positions = new Float32Array(starCount * 3);
@@ -23,13 +21,11 @@ const starMaterial = new THREE.PointsMaterial({ color: 0x888888, size: 0.05 }); 
 const stars = new THREE.Points(starGeometry, starMaterial);
 scene.add(stars);
 
-// Create the Sun
 const sunGeometry = new THREE.SphereGeometry(0.06, 32, 32);
 const sunMaterial = new THREE.MeshBasicMaterial({ color: 0xffff00 });
 const sun = new THREE.Mesh(sunGeometry, sunMaterial);
 scene.add(sun);
 
-// Planet parameters (e: eccentricity, a: semi-major axis, i: inclination)
 const planets = [
     { full_name: 'Mercury', a: 0.387, e: 0.206, per_y: 0.241, size: 0.02, color: 0xaaaaaa, i: 7.0, ma: 3.050, w: 0.509, om: 0.842 },
     { full_name: 'Venus', a: 0.723, e: 0.007, per_y: 0.615, size: 0.04, color: 0xffcc00, i: 3.39, ma: 0.875, w: 0.960, om: 1.338 },
@@ -892,7 +888,6 @@ const PHAs = [
     { full_name: '719194 (2018 PL23)', a: 1.567, e: 0.7870, i: 14.35, ma: 341.87, w: 293.68, om: 178.29, per_y: 1.96 } 
 ];
  
-// Function to calculate the position using the elliptical orbit formula
 function ellipticalOrbit(a, e, i, om, w, ma) {
     const toRadians = degrees => degrees * (Math.PI / 180);
     
@@ -918,7 +913,6 @@ function ellipticalOrbit(a, e, i, om, w, ma) {
     return { x, y, z };
 }
 
-// Create planet meshes
 const planetMeshes = planets.map(planet => {
     const geometry = new THREE.SphereGeometry(planet.size, 16, 16);
     const material = new THREE.MeshBasicMaterial({ color: planet.color });
@@ -928,7 +922,7 @@ const planetMeshes = planets.map(planet => {
     createOrbitPath(planet.a, planet.e, planet.i, planet.w, planet.om, 0xffffff);
 
     const label = createLabel(planet.full_name, new THREE.Vector3(planet.a, 0, 0));
-    label.position.z += 0.1; // Offset for visibility
+    label.position.z += 0.1; 
     scene.add(label);
 
     return { mesh, ...planet, label };
@@ -943,13 +937,12 @@ const PHAMeshes = PHAs.map(PHA => {
     createOrbitPath(PHA.a, PHA.e, PHA.i, PHA.w, PHA.om);
 
     const label = createLabel(PHA.full_name, new THREE.Vector3(PHA.a, 0, 0));
-    label.position.z += 0.1; // Offset for visibility
+    label.position.z += 0.1; 
     scene.add(label);
 
     return { mesh, ...PHA, label };
 });
 
-// Helper function to create orbit path
 function createOrbitPath(a, e, i, w, om, color, opacity = 1) {
     const orbitPoints = [];
     const numPoints = 100;
@@ -962,15 +955,14 @@ function createOrbitPath(a, e, i, w, om, color, opacity = 1) {
     const orbitGeometry = new THREE.BufferGeometry().setFromPoints(orbitPoints);
     const orbitMaterial = new THREE.LineBasicMaterial({
         color: 0xcf5f57,
-        opacity: opacity, // Use the passed opacity value
-        transparent: true // Set to true to enable opacity effect
+        opacity: opacity,
+        transparent: true 
     });
     const orbitLine = new THREE.LineLoop(orbitGeometry, orbitMaterial);
     scene.add(orbitLine);
 }
 
 
-// Helper function to create label
 function createLabel(text, position) {
     const canvas = document.createElement('canvas');
     const context = canvas.getContext('2d');
@@ -988,11 +980,9 @@ function createLabel(text, position) {
     return sprite;
 }
 
-// Camera setup
 camera.position.z = 3;
 camera.position.y = 0.5;
 
-// Speed control UI
 let time = 0;
 let speedFactor = 0.0025;
 
@@ -1024,17 +1014,17 @@ toggleOrbitButton.style.fontSize = '16px';
 toggleOrbitButton.style.cursor = 'pointer';
 document.body.appendChild(toggleOrbitButton);
 
-let orbitsVisible = false; // Initial state of orbit visibility
+let orbitsVisible = false; 
 
 toggleOrbitButton.addEventListener('click', () => {
-    orbitsVisible = !orbitsVisible; // Toggle state
-    updateOrbitVisibility(orbitsVisible); // Update visibility
+    orbitsVisible = !orbitsVisible; 
+    updateOrbitVisibility(orbitsVisible); 
 });
 
 function updateOrbitVisibility(visible) {
     const orbitLines = scene.children.filter(child => child instanceof THREE.LineLoop);
     orbitLines.forEach(line => {
-        line.visible = visible; // Set visibility
+        line.visible = visible; 
     });
 }
 
@@ -1048,11 +1038,11 @@ toggleLabelButton.style.fontSize = '16px';
 toggleLabelButton.style.cursor = 'pointer';
 document.body.appendChild(toggleLabelButton);
 
-let labelVisible = true; // Initial state of label visibility
+let labelVisible = true; 
 
 toggleLabelButton.addEventListener('click', () => {
-    labelVisible = !labelVisible; // Toggle state
-    updateLabelVisibility(labelVisible); // Update visibility
+    labelVisible = !labelVisible; 
+    updateLabelVisibility(labelVisible); 
 });
 
 function updateLabelVisibility(visible) {
@@ -1064,13 +1054,12 @@ function updateLabelVisibility(visible) {
     const labels = scene.children.filter(child => child instanceof THREE.Sprite);
     
     labels.forEach(sprite => {
-        sprite.visible = visible; // Set visibility
+        sprite.visible = visible;
     });
 
     console.log(`Labels visibility set to: ${visible}`);
 }
 
-// Animation loop
 function animate() {
     requestAnimationFrame(animate);
     time += 0.01 * speedFactor;
@@ -1089,7 +1078,7 @@ function animate() {
         label.position.set(x, y, z);
     });
     
-    stars.rotation.y += 0.0001; // Add this in the animate function
+    stars.rotation.y += 0.0001; 
 
 
     renderer.render(scene, camera);
@@ -1101,7 +1090,7 @@ window.addEventListener('resize', () => {
     renderer.setSize(window.innerWidth, window.innerHeight);
 });
 
-// Add simple interactivity
+
 planetMeshes.forEach(({ mesh, full_name }) => {
     mesh.userData = { full_name };
 });
@@ -1110,7 +1099,7 @@ PHAMeshes.forEach(({ mesh, full_name }) => {
     mesh.userData = { full_name };
 });
 
-// Raycaster for detecting clicks
+
 const raycaster = new THREE.Raycaster();
 const mouse = new THREE.Vector2();
 
@@ -1126,7 +1115,7 @@ function onMouseClick(event) {
         const objectData = clickedObject.userData;
         alert(`You clicked on ${objectData.full_name}`);
 
-        // Change color temporarily
+    
         const originalColor = clickedObject.material.color.getHex();
         clickedObject.material.color.set(0xff0000);
         setTimeout(() => {
